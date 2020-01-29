@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -124,6 +125,8 @@ public class ConfiguracaoEscolarService extends Service {
 
 		Query query = em.createNativeQuery(sql.toString());
 		List<Object[]> boletos = query.getResultList();
+		System.out.println("QUERY  BOLEtoS = " + sql);
+		System.out.println("Total de boletos = " + boletos.size());
 		List<Boleto> boletosAx = new ArrayList<>();
 		for (Object[] bo : boletos) {
 			System.out.println(bo[0]);
@@ -180,45 +183,51 @@ public class ConfiguracaoEscolarService extends Service {
 		List<Object[]> boletos = query.getResultList();
 		List<Boleto> boletosAx = new ArrayList<>();
 		for (Object[] bo : boletos) {
-			System.out.println(bo[0]);
-
-			BigInteger id = (BigInteger) bo[0];
-			Date vencimento =  (Date) bo[7];
-			Date emissao = (Date) bo[5];
-			double valorNominal = (double) bo[6];
-			BigInteger nossoNumero = (BigInteger) bo[9];
-			Double valorPago =  (Double) bo[11];
-			Date dataPagamento = (Date) bo[10];;
-
-			BigInteger idContrato = (BigInteger) bo[18];
-			Object[] contratoAluno = getContrato(id.longValue());
-			//Dados do pagador
-			String cep =  (String) contratoAluno[5];
-			String cidade =  (String) contratoAluno[6];
-			String cpfResponsavel = (String) contratoAluno[9];
-			String nomeResponsavel = (String) contratoAluno[18];
-			String endereco = (String) contratoAluno[13];
-			String UF = "SC";
-			String bairro = (String) contratoAluno[3];
 			
-			Boleto b = new Boleto();
-			b.setId(id.longValue());
-			b.setBairro(bairro);
-			b.setCep(cep);
-			b.setCidade(cidade);
-			b.setCpfResponsavel(cpfResponsavel);
-			b.setDataPagamento(dataPagamento);
-			b.setEmissao(emissao);
-			b.setEndereco(endereco);
-			b.setNomeResponsavel(nomeResponsavel);
-			b.setNossoNumero(nossoNumero.toString());
-			b.setUF(UF);
-			b.setValorNominal(valorNominal);
-			b.setValorPago(valorPago);
-			b.setVencimento(vencimento);
+			Boleto b = montaBoleto(bo);
 			boletosAx.add(b);
 		}
 		return boletosAx;
+	}
+
+	private Boleto montaBoleto(Object[] bo) {
+		System.out.println(bo[0]);
+
+		BigInteger id = (BigInteger) bo[0];
+		Date vencimento =  (Date) bo[7];
+		Date emissao = (Date) bo[5];
+		double valorNominal = (double) bo[6];
+		BigInteger nossoNumero = (BigInteger) bo[9];
+		Double valorPago =  (Double) bo[11];
+		Date dataPagamento = (Date) bo[10];;
+
+		BigInteger idContrato = (BigInteger) bo[18];
+		Object[] contratoAluno = getContrato(id.longValue());
+		//Dados do pagador
+		String cep =  (String) contratoAluno[5];
+		String cidade =  (String) contratoAluno[6];
+		String cpfResponsavel = (String) contratoAluno[9];
+		String nomeResponsavel = (String) contratoAluno[18];
+		String endereco = (String) contratoAluno[13];
+		String UF = "SC";
+		String bairro = (String) contratoAluno[3];
+		
+		Boleto b = new Boleto();
+		b.setId(id.longValue());
+		b.setBairro(bairro);
+		b.setCep(cep);
+		b.setCidade(cidade);
+		b.setCpfResponsavel(cpfResponsavel);
+		b.setDataPagamento(dataPagamento);
+		b.setEmissao(emissao);
+		b.setEndereco(endereco);
+		b.setNomeResponsavel(nomeResponsavel);
+		b.setNossoNumero(nossoNumero.toString());
+		b.setUF(UF);
+		b.setValorNominal(valorNominal);
+		b.setValorPago(valorPago);
+		b.setVencimento(vencimento);
+		return b;
 	}
 
 	private Long getContrato_boleto(Long idBoleto) {
@@ -288,4 +297,75 @@ public class ConfiguracaoEscolarService extends Service {
 
 	}
 
+	public void criarUsuariosApp() {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * from contratoAluno cab ");
+		sql.append(" where 1 = 1");
+		sql.append(" and (cab.usuarioAppCriado is null or cab.usuarioAppCriado = false )");
+		sql.append(" and cab.ano = ");
+		sql.append(getConfiguracao().getAnoLetivo());
+		sql.append(" and (cab.cancelado is null or  cab.cancelado= false )");
+		sql.append(" and (cab.protestado is null or  cab.protestado= false )");
+		
+		Query query = em.createNativeQuery(sql.toString());
+		List<Object[]> contratoAluno_boleto = (List<Object[]>) query.getResultList();
+		for(Object[] obj : contratoAluno_boleto){
+			try{
+				TimeUnit.SECONDS.sleep(1);
+				if(obj[21] != null){
+					Long idContrato = ((BigInteger) obj[0]).longValue();
+					//String cep =  (String) obj[5];
+					//String cidade =  (String) obj[6];
+					String cpfResponsavel = (String) obj[9];
+					String rgResponsavel = (String) obj[21];
+					String nomeResponsavel = (String) obj[18];
+					//	String endereco = (String) obj[13];
+					//	String UF = "SC";
+					//	String bairro = (String) obj[3];
+					
+					StringBuilder insertAluno = new StringBuilder();
+					insertAluno.append("INSERT INTO Member");
+					insertAluno.append(" (id,login, name, senha,tipoMembro,idContratoAtivo) ");
+					insertAluno.append(" VALUES ");
+					insertAluno.append(" (nextval('Member_pk_seq'),'");
+					insertAluno.append(cpfResponsavel);
+					insertAluno.append("','");
+					insertAluno.append(nomeResponsavel);
+					insertAluno.append("','");
+					insertAluno.append(rgResponsavel);
+					insertAluno.append("',");
+					insertAluno.append(3);
+					insertAluno.append(",'");
+					insertAluno.append(idContrato);
+					insertAluno.append("' ) ");
+					Query queryInsertAluno = em.createNativeQuery(insertAluno.toString());
+					System.out.println("______________________________------------------ queryInsertAluno " + insertAluno);
+					int ok = queryInsertAluno.executeUpdate();
+					
+					System.out.println(ok);
+					
+					
+					if(ok == 1){
+						StringBuilder sqlupdateContrato = new StringBuilder();
+						sqlupdateContrato.append("UPDATE ContratoAluno as ca ");
+						sqlupdateContrato.append("SET");
+						sqlupdateContrato.append(" usuarioAppCriado = true");
+						sqlupdateContrato.append(" WHERE ");
+						sqlupdateContrato.append(" ca.id =  ");
+						sqlupdateContrato.append(idContrato);
+						Query queryUpContrato = em.createNativeQuery(sqlupdateContrato.toString());
+						System.out.println("______________________________------------------ queryInsertAluno " + sqlupdateContrato);
+						int at = queryUpContrato.executeUpdate();
+						if (at == 1) {
+						System.out.println("CRIANDO Usuario app");
+						}
+					}
+					//TOdo fazer update no c
+				}
+				em.flush();
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
 }

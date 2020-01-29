@@ -35,27 +35,33 @@ public class RotinaAutomatica {
 	private FinanceiroEscolaService financeiroEscolaService;
 		
 	@Schedule(minute = "*/7",hour = "*", persistent = false)
-	public void importarPagamentoAdonai() {
+	public synchronized void importarPagamentoAdonai() {
 		System.out.println("Importando pagamentos do banco......Adonai");
 		cnab240.importarPagamentosCNAB240(Projeto.ADONAI);
 	}
 	
 	@Schedule(minute = "*/5",hour = "*", persistent = false)
-	public void importarPagamentoTefamel() {
+	public synchronized void importarPagamentoTefamel() {
 		System.out.println("Importando pagamentos do banco...... TEFAMEL");
 		cnab240.importarPagamentosCNAB240(Projeto.TEFAMEL);
 	}
 	
 	@Schedule(minute = "*/45",hour = "*", persistent = false)
-	public void gerarCnabCancelamentoTefamel() {
+	public synchronized void gerarCnabCancelamentoTefamel() {
 		System.out.println("Gerar Cnab Cancelamento ...... TEFAMEL");
 		cnab240.gerarArquivoBaixaBoletos(true, Projeto.TEFAMEL);
 	}
 	
 	@Schedule(minute = "*/47",hour = "*", persistent = false)
-	public void gerarCnabCancelamentoAdonai() {
+	public synchronized void gerarCnabCancelamentoAdonai() {
 		System.out.println("Gerar Cnab Cancelamento ...... Adonai");
 		cnab240.gerarArquivoBaixaBoletos(true, Projeto.ADONAI);
+	}
+	
+	@Schedule(minute = "*/17",hour = "*", persistent = false)
+	public synchronized void criarUsuarioAppTefamel() {
+		System.out.println("Criando usuario APP Tefmael");
+		cnab240.criarUsuariosApp(Projeto.TEFAMEL);
 	}
 	
 	/*
@@ -92,20 +98,25 @@ public class RotinaAutomatica {
 		}
 	}*/
 	
-	@Schedule( minute = "*/29", hour = "*", persistent = false)
+	@Schedule( minute = "*/9", hour = "*", persistent = false)
 	public void geradorDeCnabDeEnvioAdonai() {
 		System.out.println("Gerando Arquivo CNAB de envio ADONAI......");
 		int mes = 0;
 		Date d = new Date();
 		mes = Util.getMesInt(d);
-
+		System.out.println("MES: " + mes);
+		
 		//Geracao do CNAB para o Mes atual e o mes seguinte
 		cnab240.gerarCNAB240DeEnvio(mes,Projeto.ADONAI);
-		mes ++;
+		if(mes == 12){
+			mes = 1;
+		}else{
+			mes ++;
+		}
 		cnab240.gerarCNAB240DeEnvio(mes,Projeto.ADONAI);
 	}
 	
-	@Schedule( minute = "*/23", hour = "*", persistent = false)
+	@Schedule( minute = "*/13", hour = "*", persistent = false)
 	public void geradorDeCnabDeEnvioTefamel() {
 		System.out.println("Gerando Arquivo CNAB de envio TEFAMEL......");
 
@@ -115,7 +126,11 @@ public class RotinaAutomatica {
 
 		//Geracao do CNAB para o Mes atual e o mes seguinte
 		cnab240.gerarCNAB240DeEnvio(mes,Projeto.TEFAMEL);
-		mes ++;
+		if(mes == 12){
+			mes = 1;
+		}else{
+			mes ++;
+		}
 		cnab240.gerarCNAB240DeEnvio(mes,Projeto.TEFAMEL);
 	}
 	

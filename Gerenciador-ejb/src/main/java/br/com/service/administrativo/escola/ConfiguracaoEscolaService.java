@@ -126,6 +126,10 @@ public class ConfiguracaoEscolaService extends Service {
 		Query query = em.createNativeQuery(sql.toString());
 		@SuppressWarnings("unchecked")
 		List<Object[]> boletos = query.getResultList();
+		
+		System.out.println("QUERY  BOLEtoS = " + sql);
+		System.out.println("Total de boletos = " + boletos.size());
+		
 		List<Boleto> boletosAx = new ArrayList<>();
 		for (Object[] bo : boletos) {
 			System.out.println(bo[0]);

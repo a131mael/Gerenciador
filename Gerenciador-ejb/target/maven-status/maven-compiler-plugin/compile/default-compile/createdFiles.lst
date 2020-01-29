@@ -9,6 +9,7 @@ br\com\aff\Administrativo\CNAB_240\CONSTANTES.class
 br\com\administrativo\model\Configuracao.class
 br\com\aff\Administrativo\CNAB_240\CNAB240.class
 br\com\service\administrativo\escola\FinanceiroEscolarService.class
+br\com\nfse\EnvioNFE.class
 br\com\service\administrativo\util\Util.class
 br\com\aff\Administrativo\CNAB_240\RotinaAutomatica.class
 br\com\service\administrativo\util\ServiceLocator.class

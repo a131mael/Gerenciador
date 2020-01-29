@@ -13,6 +13,8 @@ public class Util {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		int mes = c.get(Calendar.MONTH)+1;
+		System.out.println("Sera que é aqui ? " + date);
+		System.out.println("Sera que é aqui ? mes " + mes);
 		return mes;
 	}
 	

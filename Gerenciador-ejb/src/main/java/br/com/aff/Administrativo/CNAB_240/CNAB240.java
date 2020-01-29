@@ -58,6 +58,9 @@ public class CNAB240 {
 	public void importarBoletos(List<Pagador> boletosImportados, boolean extratoBancario, Projeto projeto) throws ParseException {
 
 		for (Pagador pagador : boletosImportados) {
+			if(pagador.getNome().equalsIgnoreCase("Fernando Rafaela")){
+				System.out.println("aq");
+			}
 			Boleto boletoCNAB = pagador.getBoletos().get(0);
 			String numeroDocumento = boletoCNAB.getNossoNumero();
 			if (numeroDocumento != null && !numeroDocumento.equalsIgnoreCase("") && !numeroDocumento.contains("-")	&& !numeroDocumento.contains("/")) {
@@ -135,7 +138,6 @@ public class CNAB240 {
 					}
 
 					try {
-					
 						if(boletosImportados != null && boletosImportados.size()>0 ){
 							Boleto boletoCNAB = boletosImportados.get(0).getBoletos().get(0);
 							if(boletoCNAB.getNumeroDaConta().equalsIgnoreCase("49469") && projeto.equals(Projeto.ADONAI)){
@@ -144,7 +146,6 @@ public class CNAB240 {
 								br.com.aff.Administrativo.CNAB_240.OfficeUtil.moveFile(path + arquivos[i].getName(),CONSTANTES.LOCAL_ARMAZENAMENTO_REMESSA_IMPORTADA + OfficeUtil.retornaDataSomenteNumeros(hj) + arquivos[i].getName());
 							}
 						}
-						
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -255,6 +256,8 @@ public class CNAB240 {
 			}else if(projeto.equals(Projeto.ADONAI)){
 				boletos = configuracaoEscolaService.findBoletosMes(mes);
 			}
+			
+			System.out.println("Boletos pra enviar" + boletos.size());
 
 			//TODO COLOCAR O CAMINHO PARA ENVIO NO SERVIDOR
 			String caminhoFinalPasta = CONSTANTES.PATH_ENVIAR_CNAB;
@@ -263,7 +266,8 @@ public class CNAB240 {
 			for (Boleto b : boletos) {
 				InputStream stream = gerarCNB240(b, mes, caminhoFinalPasta, projeto);
 				FileUtils.inputStreamToFile(stream, b.getNossoNumero()+"");
-
+				System.out.println("Boleto " + b.getNomeResponsavel());
+				System.out.println("caminhoFinalPasta " + caminhoFinalPasta);
 				if(projeto.equals(Projeto.TEFAMEL)){
 					configuracaoEscolarService.mudarStatusParaCNABEnviado(b);
 					
@@ -294,6 +298,8 @@ public class CNAB240 {
 			}
 
 			InputStream stream = gerarCNB240(sequencialArquivo, b, mes, caminhoArquivo, projeto);
+			System.out.println("gerou o stream " + caminhoArquivo);
+			System.out.println("mes " + mes);
 			
 			if(projeto.equals(Projeto.TEFAMEL)){
 				configuracaoEscolarService.incrementaSequencialArquivoCNAB();
@@ -384,6 +390,11 @@ public class CNAB240 {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public void criarUsuariosApp(Projeto tefamel) {
+		configuracaoEscolarService.criarUsuariosApp();
+		
 	}
 
 }
