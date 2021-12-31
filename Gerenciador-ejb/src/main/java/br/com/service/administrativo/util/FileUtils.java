@@ -186,8 +186,8 @@ public class FileUtils {
 
 	public static void inputStreamToFile(InputStream initialStream, String arquivoSaida) {
 		try {
+			System.out.println("LOCAL DO ARQUIVO DE SAIDA" + arquivoSaida);
 			File targetFile = new File(arquivoSaida);
-
 			java.nio.file.Files.copy(initialStream, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			IOUtils.closeQuietly(initialStream);
 

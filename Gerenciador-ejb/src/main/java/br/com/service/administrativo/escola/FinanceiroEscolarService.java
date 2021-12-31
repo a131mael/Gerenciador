@@ -95,7 +95,6 @@ public class FinanceiroEscolarService extends Service {
 	}
 
 	public void updateBoleto(Long numeroBoleto, String nomePagador, Double valor, Date dataPagamento, Boolean extrato) {
-		em.flush();
 		
 		StringBuilder sql = new StringBuilder();
 		sql.append("UPDATE boleto as bol ");
@@ -131,21 +130,30 @@ public class FinanceiroEscolarService extends Service {
 			if(at == 0){
 				System.out.println("nao encontrou boleto com id e nome do reponsavel  = " + nomePagador.trim() + " = "+ numeroBoleto);
 			}
-			System.out.println("boletosAtualizados = " + at);
-		}catch(Exception e){
-			Query query2 = em.createNativeQuery(sql.toString());
-			int at = query2.executeUpdate();
 			if(at == 0){
 				System.out.println("nao encontrou boleto com id e nome do reponsavel  = " + nomePagador.trim() + " = "+ numeroBoleto);
+			}else{
+				System.out.println("boletosAtualizados = " + at);
 			}
-			System.out.println("boletosAtualizados = " + at);
+		}catch(Exception e){
+			try {
+				Query query2 = em.createNativeQuery(sql.toString());
+				int at = query2.executeUpdate();
+				if(at == 0){
+					System.out.println("nao encontrou boleto com id e nome do reponsavel  = " + nomePagador.trim() + " = "+ numeroBoleto);
+				}else{
+					System.out.println("boletosAtualizados = " + at);
+				}
+				
+			} catch (Exception e2) {
+				System.out.println("NAO ACHOU O BOLETO com numero = " + numeroBoleto  + "com o pagador : " + nomePagador.trim());
+			}
 		}
 		
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 		}
-		em.flush();
 	}
 	
 	public List<Boleto> findBoletos(boolean cancelado, boolean arquivoGerado) {

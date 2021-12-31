@@ -177,7 +177,7 @@ public class ConfiguracaoEscolarService extends Service {
 		sql.append(" and (bol.cancelado = true)");
 		sql.append(" and (bol.cnabCanceladoEnviado = false or bol.cnabCanceladoEnviado is null)");
 		sql.append(" and (bol.cnabEnviado = true)");
-		sql.append(" and valorPago = 0 ");
+		sql.append(" and (valorPago = 0 or valorPago is null)");
 		
 		Query query = em.createNativeQuery(sql.toString());
 		List<Object[]> boletos = query.getResultList();
@@ -332,7 +332,7 @@ public class ConfiguracaoEscolarService extends Service {
 					insertAluno.append("','");
 					insertAluno.append(nomeResponsavel);
 					insertAluno.append("','");
-					insertAluno.append(rgResponsavel);
+					insertAluno.append(cpfResponsavel);
 					insertAluno.append("',");
 					insertAluno.append(3);
 					insertAluno.append(",'");
@@ -367,5 +367,19 @@ public class ConfiguracaoEscolarService extends Service {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void mudarStatusParaCNABCanceladoEnviado(List<Boleto> boletos) {
+		for(Boleto b :boletos){
+			mudarStatusParaCNABCanceladoEnviado(b);
+		}
+		
+	}
+
+	public void mudarStatusParaCNABEnviado(List<Boleto> boletos) {
+		for(Boleto b : boletos){
+			mudarStatusParaCNABEnviado(b);
+		}
+		
 	}
 }

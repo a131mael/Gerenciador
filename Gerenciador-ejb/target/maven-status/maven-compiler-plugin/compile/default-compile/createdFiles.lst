@@ -7,6 +7,7 @@ br\com\service\administrativo\util\CompactadorZip.class
 br\com\service\administrativo\util\Projeto.class
 br\com\aff\Administrativo\CNAB_240\CONSTANTES.class
 br\com\administrativo\model\Configuracao.class
+br\com\aff\Administrativo\CNAB_240\CNAB240$1.class
 br\com\aff\Administrativo\CNAB_240\CNAB240.class
 br\com\service\administrativo\escola\FinanceiroEscolarService.class
 br\com\nfse\EnvioNFE.class

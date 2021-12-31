@@ -13,7 +13,6 @@ import br.com.administrativo.model.Pagador;
 public class CNAB240_RETORNO_SICOOB {
 
 	public static List<Pagador> imporCNAB240(String arquivoPath) throws ParseException {
-		System.out.println("Caminho dos arquivos para importar: " + arquivoPath);
 		List<Pagador> pagadores = new ArrayList<Pagador>();
 
 		List<String> arquivo = OfficeUtil.lerArquivo(arquivoPath);
@@ -62,7 +61,6 @@ public class CNAB240_RETORNO_SICOOB {
 	}
 
 	public static List<Pagador> importarExtratoCNAB240(String path) throws ParseException {
-		System.out.println("Caminho dos arquivos para importar: " + path);
 		List<Pagador> pagadores = new ArrayList<Pagador>();
 		File arquivos[];
 		File diretorio = new File(path);

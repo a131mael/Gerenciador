@@ -179,7 +179,7 @@ public class ConfiguracaoEscolaService extends Service {
 		sql.append(" and (bol.cancelado = true)");
 		sql.append(" and (bol.cnabCanceladoEnviado = false or bol.cnabCanceladoEnviado is null)");
 		sql.append(" and (bol.cnabEnviado = true)");
-		sql.append(" and valorPago = 0 ");
+		sql.append(" and (valorPago = 0 or valorPago is null)");
 		
 		Query query = em.createNativeQuery(sql.toString());
 		List<Object[]> boletos = query.getResultList();
@@ -289,6 +289,18 @@ public class ConfiguracaoEscolaService extends Service {
 		}
 		System.out.println("boletosAtualizados = " + at);
 
+	}
+
+	public void mudarStatusParaCNABCanceladoEnviado(List<Boleto> boletos) {
+		for(Boleto b : boletos){
+			mudarStatusParaCNABCanceladoEnviado(b);
+		}
+	}
+
+	public void mudarStatusParaCNABEnviado(List<Boleto> boletos) {
+		for(Boleto b : boletos){
+			mudarStatusParaCNABEnviado(b);
+		}
 	}
 	
 }

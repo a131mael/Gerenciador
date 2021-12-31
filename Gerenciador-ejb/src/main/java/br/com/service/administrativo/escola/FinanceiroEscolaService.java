@@ -125,20 +125,35 @@ public class FinanceiroEscolaService extends Service {
 			em.flush();
 			Query query = em.createNativeQuery(sql.toString());
 			int at = query.executeUpdate();
-			System.out.println("boletosAtualizados = " + at);
+			if(at == 0){
+				System.out.println("nao encontrou boleto com id e nome do reponsavel  = " + nomePagador.trim() + " = "+ numeroBoleto);
+			}else{
+				System.out.println("boletosAtualizados = " + at);
+			}
+			
 			em.flush();
 		}catch(Exception e){
-			Query query2 = em.createNativeQuery(sql.toString());
-			int at = query2.executeUpdate();
-			System.out.println("boletosAtualizados = " + at);
+			try {
+				Query query2 = em.createNativeQuery(sql.toString());
+				int at = query2.executeUpdate();
+				System.out.println("boletosAtualizados = " + at);
+				if(at == 0){
+					System.out.println("nao encontrou boleto com id e nome do reponsavel  = " + nomePagador.trim() + " = "+ numeroBoleto);
+				}else{
+					System.out.println("boletosAtualizados = " + at);
+				}
+				
+			} catch (Exception e2) {
+				System.out.println("NAO ACHOU O BOLETO com numero = " + numeroBoleto  + "com o pagador : " + nomePagador.trim());
+			}
+			
 		}
 		
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		em.flush();
 	}
 
 	public List<Boleto> findBoletos(boolean cancelado, boolean arquivoGerado) {
