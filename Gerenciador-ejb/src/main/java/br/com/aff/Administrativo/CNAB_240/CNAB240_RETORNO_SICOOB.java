@@ -26,16 +26,20 @@ public class CNAB240_RETORNO_SICOOB {
 
 			// segmento T
 			pagador.setNome(getNomePagador(arquivo.get(j)));
-			
 			pagador.setCpfCNPJ(getCPFPagador(arquivo.get(j)));
 			b.setMovimento(getMovimentoRetorno(arquivo.get(j)));
 			b.setNossoNumero(getNumeroDocumento(arquivo.get(j)));
 			b.setDecurso(getIsDecurso(arquivo.get(j)));
 
 			// segmento U
-			if ((b.getMovimento().equalsIgnoreCase("09") || b.getMovimento().equalsIgnoreCase("06")|| b.getMovimento().equalsIgnoreCase("05") || b.getMovimento().equalsIgnoreCase("45"))) {
+			if ((b.getMovimento().equalsIgnoreCase("09") 
+					|| b.getMovimento().equalsIgnoreCase("06")
+					|| b.getMovimento().equalsIgnoreCase("05") 
+					|| b.getMovimento().equalsIgnoreCase("45"))) {
+				
 				b.setValorNominal(Double.parseDouble(getValorNominal(arquivo.get(j))));
 				b.setDataPagamento(OfficeUtil.retornaData(getDataEvento(arquivo.get(j + 1))));
+				
 				if(b.getMovimento().equalsIgnoreCase("09")){
 					b.setValorPago(b.getValorNominal());
 				}else{

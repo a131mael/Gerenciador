@@ -29,7 +29,6 @@ public class Configuracao implements Serializable {
     @Column
     private long sequencialArquivoCNAB;
     
-    
 	public Long getId() {
 		return id;
 	}

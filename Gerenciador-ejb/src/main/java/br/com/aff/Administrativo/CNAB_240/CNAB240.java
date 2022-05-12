@@ -83,8 +83,21 @@ public class CNAB240 {
 								if (numeroDocumentoLong != null && numeroDocumentoLong > 0) {
 									if (boletoCNAB.getNumeroDaConta() != null && boletoCNAB.getNumeroDaConta().equalsIgnoreCase("49469") && projeto.equals(Projeto.ADONAI)) {
 										if (!(boletoCNAB.isDecurso() != null && boletoCNAB.isDecurso())) {
-											financeiroEscolaService.updateBoleto(numeroDocumentoLong, pagador.getNome(),boletoCNAB.getValorPago(), boletoCNAB.getDataPagamento(),
-													extratoBancario);
+											if(boletoCNAB.getMovimento().equalsIgnoreCase("09")){
+												if(boletoCNAB.getValorPago() == null || boletoCNAB.getValorPago() == 0D){
+													if(boletoCNAB.getValorNominal() == 0D && boletoCNAB.getValorNominal() < 1d){
+														boletoCNAB.setValorPago(300d);
+													}else{
+														boletoCNAB.setValorPago(boletoCNAB.getValorNominal());
+													}
+												}
+												
+												if(boletoCNAB.getDataPagamento() == null){
+													boletoCNAB.setDataPagamento(new Date());
+												}
+											}
+											
+											financeiroEscolaService.updateBoleto(numeroDocumentoLong, pagador.getNome(),boletoCNAB.getValorPago(), boletoCNAB.getDataPagamento(),	extratoBancario);
 										} else if ((boletoCNAB.isDecurso() != null && boletoCNAB.isDecurso())) {
 											financeiroEscolaService.updateBoletoProtesto(numeroDocumentoLong,pagador.getNome(), extratoBancario);
 											System.out.println("DECURSO PQP");
@@ -211,10 +224,15 @@ public class CNAB240 {
 			if (projeto.equals(Projeto.TEFAMEL)) {
 				if (cancelado) {
 					boletos = configuracaoEscolarService.findBoletosCancelados(false);
+				}else{
+					boletos = configuracaoEscolarService.findBoletosBaixados(false);
+					
 				}
 			} else if (projeto.equals(Projeto.ADONAI)) {
 				if (cancelado) {
 					boletos = configuracaoEscolaService.findBoletosCancelados(false);
+				}else{
+					boletos = configuracaoEscolaService.findBoletosBaixados(false);
 				}
 			}
 			System.out.println(cancelado + " - TOTAL DE BOLETOS ENCONTRADOS PARA CANCELAR = " + boletos.size());

@@ -62,11 +62,23 @@ public class RotinaAutomatica {
 		System.out.println("Gerar Cnab Cancelamento ...... TEFAMEL");
 		cnab240.gerarArquivoBaixaBoletos(true, Projeto.TEFAMEL, true);
 	}
+	
+	@Schedule(minute = "*/10", hour = "*", persistent = false)
+	public synchronized void gerarCnabBaixaTefamel() {
+		System.out.println("Gerar Cnab Cancelamento ...... TEFAMEL");
+		cnab240.gerarArquivoBaixaBoletos(false, Projeto.TEFAMEL, true);
+	}
 
 	@Schedule(minute = "30", hour = "*/2", persistent = false)
 	public synchronized void gerarCnabCancelamentoAdonai() {
 		System.out.println("Gerar Cnab Cancelamento ...... Adonai");
 		cnab240.gerarArquivoBaixaBoletos(true, Projeto.ADONAI, true);
+	}
+	
+	@Schedule(minute = "8", hour = "*/2", persistent = false)
+	public synchronized void gerarCnabBaixaAdonai() {
+		System.out.println("Gerar Cnab Cancelamento ...... Adonai");
+		cnab240.gerarArquivoBaixaBoletos(false, Projeto.ADONAI, true);
 	}
 
 	@Schedule(minute = "17", hour = "03", persistent = false)

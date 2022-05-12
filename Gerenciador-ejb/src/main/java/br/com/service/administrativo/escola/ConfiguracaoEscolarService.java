@@ -189,6 +189,29 @@ public class ConfiguracaoEscolarService extends Service {
 		}
 		return boletosAx;
 	}
+	
+	public List<Boleto> findBoletosBaixados(boolean jaEnviado) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * from boleto bol ");
+		sql.append(" where 1 = 1");
+		sql.append(" and (bol.baixaManual = true)");
+		
+		sql.append(" and (cnabCanceladoEnviado is null)");
+		sql.append(" and (vencimento > '2021-09-01')");
+		
+		sql.append(" and (bol.baixaGerada = false or bol.baixaGerada is null)");
+		sql.append(" and (bol.cnabEnviado = true)");
+		
+		Query query = em.createNativeQuery(sql.toString());
+		List<Object[]> boletos = query.getResultList();
+		List<Boleto> boletosAx = new ArrayList<>();
+		for (Object[] bo : boletos) {
+			
+			Boleto b = montaBoleto(bo);
+			boletosAx.add(b);
+		}
+		return boletosAx;
+	}
 
 	private Boleto montaBoleto(Object[] bo) {
 		System.out.println(bo[0]);
@@ -283,6 +306,7 @@ public class ConfiguracaoEscolarService extends Service {
 		sql.append("UPDATE boleto as bol ");
 		sql.append("SET");
 		sql.append(" cnabCanceladoEnviado = true");
+		sql.append(", baixaGerada = true");
 		sql.append(" WHERE ");
 		sql.append("bol.id = ");
 		sql.append(b.getId());

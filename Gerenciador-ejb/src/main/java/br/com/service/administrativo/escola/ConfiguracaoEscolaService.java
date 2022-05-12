@@ -225,6 +225,63 @@ public class ConfiguracaoEscolaService extends Service {
 		return boletosAx;
 	}
 	
+	public List<Boleto> findBoletosBaixados(boolean jaEnviado) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * from boleto bol ");
+		sql.append(" where 1 = 1");
+		sql.append(" and (bol.baixaManual = true)");
+		
+		sql.append(" and (cnabCanceladoEnviado is null)");
+		sql.append(" and (vencimento > '2021-09-01')");
+		
+		sql.append(" and (bol.baixaGerada = false or bol.baixaGerada is null)");
+		sql.append(" and (bol.cnabEnviado = true)");
+		
+		Query query = em.createNativeQuery(sql.toString());
+		List<Object[]> boletos = query.getResultList();
+		List<Boleto> boletosAx = new ArrayList<>();
+		for (Object[] bo : boletos) {
+			
+			System.out.println(bo[0]);
+
+			BigInteger id = (BigInteger) bo[0];
+			Date vencimento =  (Date) bo[4];
+			Date emissao = (Date) bo[1];
+			double valorNominal = (double) bo[3];
+			BigInteger nossoNumero = (BigInteger) bo[2];
+			Double valorPago =  (Double) bo[7];
+			Date dataPagamento = (Date) bo[6];;
+
+			Object[] contratoAluno = getContrato(id.longValue());
+			//Dados do pagador
+			String cep =  (String) contratoAluno[5];
+			String cidade =  (String) contratoAluno[6];
+			String cpfResponsavel = (String) contratoAluno[9];
+			String nomeResponsavel = (String) contratoAluno[18];
+			String endereco = (String) contratoAluno[13];
+			String UF = "SC";
+			String bairro = (String) contratoAluno[3];
+			
+			Boleto b = new Boleto();
+			b.setId(id.longValue());
+			b.setBairro(bairro);
+			b.setCep(cep);
+			b.setCidade(cidade);
+			b.setCpfResponsavel(cpfResponsavel);
+			b.setDataPagamento(dataPagamento);
+			b.setEmissao(emissao);
+			b.setEndereco(endereco);
+			b.setNomeResponsavel(nomeResponsavel);
+			b.setNossoNumero(nossoNumero.toString());
+			b.setUF(UF);
+			b.setValorNominal(valorNominal);
+			b.setValorPago(valorPago);
+			b.setVencimento(vencimento);
+			boletosAx.add(b);
+		}
+		return boletosAx;
+	}
+	
 	private Long getContrato_boleto(Long idBoleto) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * from contratoAluno_boleto cab ");
@@ -277,6 +334,7 @@ public class ConfiguracaoEscolaService extends Service {
 		sql.append("UPDATE boleto as bol ");
 		sql.append("SET");
 		sql.append(" cnabCanceladoEnviado = true");
+		sql.append(", baixaGerada = true");
 		sql.append(" WHERE ");
 		sql.append("bol.id = ");
 		sql.append(b.getId());
