@@ -94,6 +94,25 @@ public class FinanceiroEscolarService extends Service {
 
 	}
 
+	public void updateContratoBoleto() {
+		try {
+			StringBuilder sql = new StringBuilder();
+			sql.append("UPDATE boleto b SET contrato_id = cb.contratoaluno_id FROM contratoaluno_boleto cb WHERE b.id = cb.boletos_id and contrato_id is null;");
+			
+			Query query2 = em.createNativeQuery(sql.toString());
+			int at = query2.executeUpdate();
+			if(at == 0){
+				System.out.println("nao atualizou nenhum boleto contrato" );
+			}else{
+				System.out.println("boletos contratos atualizados = " + at);
+			}
+			
+		} catch (Exception e2) {
+			System.out.println("Erro ao dar update");
+		}
+	}
+	
+	
 	public void updateBoleto(Long numeroBoleto, String nomePagador, Double valor, Date dataPagamento, Boolean extrato) {
 		
 		StringBuilder sql = new StringBuilder();

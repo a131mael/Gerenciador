@@ -50,20 +50,28 @@ public class RotinaAutomatica {
 		System.out.println("Importando pagamentos do banco......");
 		cnab240.importarPagamentosCNAB240();
 	}
-	//
+	
+	@Schedule(minute = "*/1", hour = "*", persistent = false)
+	public synchronized void updateContratoBoleto() {
+		System.out.println("Update Contrato Boleto");
+		cnab240.updateContratoBoleto();
+	}
+
+	// TODO REMOVIDO
 	// @Schedule(minute = "*/13",hour = "*", persistent = false)
 	// public synchronized void importarPagamentoTefamel() {
 	// System.out.println("Importando pagamentos do banco...... TEFAMEL");
 	// cnab240.importarPagamentosCNAB240(Projeto.TEFAMEL);
 	// }
 
+	// TODO REMOVIDO FIM
 	@Schedule(minute = "*/10", hour = "*", persistent = false)
 	public synchronized void gerarCnabCancelamentoTefamel() {
 		System.out.println("Gerar Cnab Cancelamento ...... TEFAMEL");
 		cnab240.gerarArquivoBaixaBoletos(true, Projeto.TEFAMEL, true);
 	}
-	
-	@Schedule(minute = "*/10", hour = "*", persistent = false)
+
+	@Schedule(minute = "*/11", hour = "*/3", persistent = false)
 	public synchronized void gerarCnabBaixaTefamel() {
 		System.out.println("Gerar Cnab Cancelamento ...... TEFAMEL");
 		cnab240.gerarArquivoBaixaBoletos(false, Projeto.TEFAMEL, true);
@@ -74,41 +82,49 @@ public class RotinaAutomatica {
 		System.out.println("Gerar Cnab Cancelamento ...... Adonai");
 		cnab240.gerarArquivoBaixaBoletos(true, Projeto.ADONAI, true);
 	}
-	
+
 	@Schedule(minute = "8", hour = "*/2", persistent = false)
 	public synchronized void gerarCnabBaixaAdonai() {
 		System.out.println("Gerar Cnab Cancelamento ...... Adonai");
 		cnab240.gerarArquivoBaixaBoletos(false, Projeto.ADONAI, true);
 	}
 
-	@Schedule(minute = "17", hour = "03", persistent = false)
-	public synchronized void criarUsuarioAppTefamel() {
-		System.out.println("Criando usuario APP Tefmael");
-		cnab240.criarUsuariosApp(Projeto.TEFAMEL);
+	// @Schedule(minute = "17", hour = "03", persistent = false)
+	// public synchronized void criarUsuarioAppTefamel() {
+	// System.out.println("Criando usuario APP Tefmael");
+	// cnab240.criarUsuariosApp(Projeto.TEFAMEL);
+	// }
+
+	// public void importarPagamento2() {
+	// System.out.println("Importando pagamentos do banco......");
+	// cnab240.importarPagamentosCNAB240();
+	// }
+
+	public void atualizarBoletoProtestado() {
+		System.out.println("Setando boleto como protestado.....");
+		try {
+			financeiroEscolarService.updateBoletoProtesto();
+		} catch (Exception e) {
+		}
+		try {
+			financeiroEscolaService.updateBoletoProtesto();
+		} catch (Exception e) {
+
+		}
 	}
 
-	/*
-	 * public void importarPagamento2() { System.out.println(
-	 * "Importando pagamentos do banco......");
-	 * cnab240.importarPagamentosCNAB240(); }
-	 */
-
-	/*
-	 * public void atualizarBoletoProtestado() { System.out.println(
-	 * "Setando boleto como protestado....."); try{
-	 * financeiroEscolarService.updateBoletoProtesto(); }catch(Exception e){ }
-	 * try{ financeiroEscolaService.updateBoletoProtesto(); }catch(Exception e){
-	 * 
-	 * } }
-	 */
-	/*
-	 * public void atualizarBoletoProtestado2() { System.out.println(
-	 * "Setando boleto como protestado....."); try{
-	 * financeiroEscolarService.updateBoletoProtesto(); }catch(Exception e){ }
-	 * try{ financeiroEscolaService.updateBoletoProtesto(); }catch(Exception e){
-	 * 
-	 * } }
-	 */
+	// public void atualizarBoletoProtestado2() {
+	// System.out.println("Setando boleto como protestado.....");
+	// try {
+	// financeiroEscolarService.updateBoletoProtesto();
+	// } catch (Exception e) {
+	// }
+	// try {
+	// financeiroEscolaService.updateBoletoProtesto();
+	// } catch (Exception e) {
+	//
+	// }
+	// }
 
 	@Schedule(minute = "*", hour = "*/4", persistent = false)
 	public synchronized void geradorDeCnabDeEnvioAdonai() {
@@ -148,45 +164,48 @@ public class RotinaAutomatica {
 	}
 
 //	@Schedule(minute = "*", hour = "*/3", persistent = false)
-//	public synchronized void enviarNFSTefamel(String pasta,String login,String senha) {
+//	public synchronized void enviarNFSTefamel(String pasta, String login, String senha) {
 //		enviarNFS("/home/servidor/nfs/tefamel/", "03660921000179", "stratus01");
 //	}
-//	
-//	@Schedule(minute = "*", hour = "*/2", persistent = false)
-//	public synchronized void enviarNFSAdonai(String pasta,String login,String senha) {
-//		enviarNFS("/home/servidor/nfs/adonai/", "14395954000155", "stratus01");
-//	}
-	
-	public synchronized void enviarNFS(String pasta,String login,String senha) {
-		System.out.println("ENVIANDO NOTAS FISCAIS  ........");
-		
-		try {
-			DefaultHttpClient httpclient = new DefaultHttpClient();
-			HttpPost httppost = new HttpPost(
-					"http://sync.nfs-e.net/datacenter/include/nfw/importa_nfw/nfw_import_upload.php");
-			File file = new File("C:\\Sicoobnet\\RetornoCNAB\\question.xml");
-			MultipartEntity mpEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-			ContentBody cbFile = new FileBody(file);
-			mpEntity.addPart("f1", cbFile);
-			mpEntity.addPart("login", new StringBody(login));
-			mpEntity.addPart("senha", new StringBody(senha));
-			mpEntity.addPart("cidade", new StringBody("8223"));
-			httppost.setEntity(mpEntity);
-			System.out.println("executing request " + httppost.getRequestLine());
-			System.out.println("Now uploading your file into uploadbox.com");
-			HttpResponse response = httpclient.execute(httppost);
-			System.out.println(response.getStatusLine());
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	//
+	// @Schedule(minute = "*", hour = "*/2", persistent = false)
+	// public synchronized void enviarNFSAdonai(String pasta,String login,String
+	// senha) {
+	// enviarNFS("/home/servidor/nfs/adonai/", "14395954000155", "stratus01");
+	// }
 
-	}
+	// public synchronized void enviarNFS(String pasta,String login,String
+	// senha) {
+	// System.out.println("ENVIANDO NOTAS FISCAIS ........");
+	//
+	// try {
+	// DefaultHttpClient httpclient = new DefaultHttpClient();
+	// HttpPost httppost = new HttpPost(
+	// "http://sync.nfs-e.net/datacenter/include/nfw/importa_nfw/nfw_import_upload.php");
+	// File file = new File("C:\\Sicoobnet\\RetornoCNAB\\question.xml");
+	// MultipartEntity mpEntity = new
+	// MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+	// ContentBody cbFile = new FileBody(file);
+	// mpEntity.addPart("f1", cbFile);
+	// mpEntity.addPart("login", new StringBody(login));
+	// mpEntity.addPart("senha", new StringBody(senha));
+	// mpEntity.addPart("cidade", new StringBody("8223"));
+	// httppost.setEntity(mpEntity);
+	// System.out.println("executing request " + httppost.getRequestLine());
+	// System.out.println("Now uploading your file into uploadbox.com");
+	// HttpResponse response = httpclient.execute(httppost);
+	// System.out.println(response.getStatusLine());
+	// } catch (UnsupportedEncodingException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// } catch (ClientProtocolException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// } catch (IOException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// }
+	//
+	// }
 
 }

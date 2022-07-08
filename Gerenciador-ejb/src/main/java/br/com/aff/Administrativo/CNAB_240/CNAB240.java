@@ -71,7 +71,9 @@ public class CNAB240 {
 							if (numeroDocumento.matches("^[0-9]*$")) {
 								Long numeroDocumentoLong = Long.parseLong(numeroDocumento);
 								if (!extratoBancario) {
-									if (numeroDocumentoLong > 100000) {
+									if (numeroDocumentoLong > 999999 ) {
+										numeroDocumentoLong -= 1000000;
+									}else if (numeroDocumentoLong > 100000 && numeroDocumentoLong < 999999 ) {
 										numeroDocumentoLong -= 100000;
 									} else {
 										numeroDocumentoLong -= 10000;
@@ -108,8 +110,7 @@ public class CNAB240 {
 										if (!(boletoCNAB.isDecurso() != null && boletoCNAB.isDecurso())) {
 											financeiroEscolarService.updateBoleto(numeroDocumentoLong,pagador.getNome(), boletoCNAB.getValorPago(),	boletoCNAB.getDataPagamento(), extratoBancario);
 										} else if ((boletoCNAB.isDecurso() != null && boletoCNAB.isDecurso())) {
-											financeiroEscolarService.updateBoletoProtesto(numeroDocumentoLong,
-													pagador.getNome(), extratoBancario);
+											financeiroEscolarService.updateBoletoProtesto(numeroDocumentoLong,pagador.getNome(), extratoBancario);
 											System.out.println("DECURSO PQP");
 										}
 									}
@@ -131,6 +132,10 @@ public class CNAB240 {
 		}
 
 	}
+	public void updateContratoBoleto() {
+		financeiroEscolarService.updateContratoBoleto();
+	}
+	
 
 	public void importarPagamentosCNAB240() {
 		try {
@@ -166,32 +171,13 @@ public class CNAB240 {
 							
 								importarBoletos(boletosImportados, false, projeto);
 
-								br.com.aff.Administrativo.CNAB_240.OfficeUtil.moveFile(path + arquivos[i].getName(), CONSTANTES.LOCAL_ARMAZENAMENTO_REMESSA_IMPORTADA
-												+ OfficeUtil.retornaDataSomenteNumeros(hj) + arquivos[i].getName()+ hj.getTime());
-								/*
-								 * if(boletoCNAB.getNumeroDaConta().
-								 * equalsIgnoreCase("49469") &&
-								 * projeto.equals(Projeto.ADONAI)){
-								 * br.com.aff.Administrativo.CNAB_240.OfficeUtil
-								 * .moveFile(path +
-								 * arquivos[i].getName(),CONSTANTES.
-								 * LOCAL_ARMAZENAMENTO_REMESSA_IMPORTADA +
-								 * OfficeUtil.retornaDataSomenteNumeros(hj) +
-								 * arquivos[i].getName()); }else
-								 * if(boletoCNAB.getNumeroDaConta().
-								 * equalsIgnoreCase("77426") &&
-								 * projeto.equals(Projeto.TEFAMEL)){
-								 * System.out.println("entro no if " + projeto);
-								 * br.com.aff.Administrativo.CNAB_240.OfficeUtil
-								 * .moveFile(path +
-								 * arquivos[i].getName(),CONSTANTES.
-								 * LOCAL_ARMAZENAMENTO_REMESSA_IMPORTADA +
-								 * OfficeUtil.retornaDataSomenteNumeros(hj) +
-								 * arquivos[i].getName()); }
-								 */
 							}
 
 						}
+
+						br.com.aff.Administrativo.CNAB_240.OfficeUtil.moveFile(path + arquivos[i].getName(), CONSTANTES.LOCAL_ARMAZENAMENTO_REMESSA_IMPORTADA
+										+ OfficeUtil.retornaDataSomenteNumeros(hj) + arquivos[i].getName()+ hj.getTime());
+						
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

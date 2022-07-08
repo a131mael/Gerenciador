@@ -15,6 +15,7 @@ public class CNAB240_RETORNO_SICOOB {
 	public static List<Pagador> imporCNAB240(String arquivoPath) throws ParseException {
 		List<Pagador> pagadores = new ArrayList<Pagador>();
 
+		
 		List<String> arquivo = OfficeUtil.lerArquivo(arquivoPath);
 		String numeroDaConta = getNumeroDaConta(arquivo.get(0));
 		for (int j = 2; j <= arquivo.size() - 3; j += 2) {
@@ -22,6 +23,7 @@ public class CNAB240_RETORNO_SICOOB {
 			Boleto b = new Boleto();
 			Pagador pagador = new Pagador();
 
+			
 			b.setNumeroDaConta(numeroDaConta);
 
 			// segmento T
@@ -45,16 +47,19 @@ public class CNAB240_RETORNO_SICOOB {
 				}else{
 					b.setValorPago(Double.parseDouble(getValorPago(arquivo.get(j + 1))) / 100); 
 				}
+				
+				List<Boleto> boletos = new ArrayList<Boleto>();
+				boletos.add(b);
+				pagador.setBoletos(boletos);
+				pagadores.add(pagador);	
+				
 			}else if ((b.getMovimento().equalsIgnoreCase("02"))){
 				//Confirmacao de boleto recebido no banco
 			}else if ((b.getMovimento().equalsIgnoreCase("03"))){
 				//rejeitado enviar email
 			}
 			
-			List<Boleto> boletos = new ArrayList<Boleto>();
-			boletos.add(b);
-			pagador.setBoletos(boletos);
-			pagadores.add(pagador);
+			
 		}
 		
 		return pagadores;
