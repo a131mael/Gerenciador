@@ -92,6 +92,24 @@ public class FinanceiroEscolaService extends Service {
 
 	}
 
+	public void updateAnoLetivo() {
+		try {
+			StringBuilder sql = new StringBuilder();
+			sql.append("update aluno set ano_letivo = anoletivo ;");
+			
+			Query query2 = em.createNativeQuery(sql.toString());
+			int at = query2.executeUpdate();
+			if(at == 0){
+				System.out.println("nao atualizou nenhum anoLetivo " );
+			}else{
+				System.out.println("anoLetivo atualizados = " + at);
+			}
+			
+		} catch (Exception e2) {
+			System.out.println("Erro ao dar update");
+		}
+	}
+	
 
 	public void updateBoleto(Long numeroBoleto, String nomePagador, Double valor, Date dataPagamento, Boolean extrato) {
 		StringBuilder sql = new StringBuilder();
@@ -118,8 +136,10 @@ public class FinanceiroEscolaService extends Service {
 		
 		sql.append(" and bol.contrato_id = cont.id ");
 		sql.append( " and UPPER(trim( "  );
+		sql.append(replaced("cont.nomeresponsavel", trocasLetrasEspeciais()));
 		
-		sql.append( "  REPLACE (REPLACE(REPLACE(REPLACE(cont.nomeresponsavel,'.',''),'Ã' ,'' ),'Ç',''),'É','')  "  );
+		
+		//sql.append( "  REPLACE (REPLACE(REPLACE(REPLACE(cont.nomeresponsavel,'.',''),'Ã' ,'' ),'Ç',''),'É','')  "  );
 		
 		sql.append( "  )) like  "  );
 		
@@ -163,6 +183,83 @@ public class FinanceiroEscolaService extends Service {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private List<String> trocasLetrasEspeciais(){
+		List<String> trocas = new ArrayList<>();
+		trocas.add(".");
+		trocas.add("Ã");
+		trocas.add("ã");
+		trocas.add("Ç");
+		trocas.add("ç");
+		trocas.add("É");
+		trocas.add("é");
+		
+		trocas.add(".");
+		trocas.add("º");
+		trocas.add("ª");
+		trocas.add("Á");
+		trocas.add("á");
+		trocas.add("Í");
+		trocas.add("í");
+		
+		trocas.add("Ó");
+		trocas.add("ó");
+		trocas.add("Ú");
+		trocas.add("ú");
+		trocas.add("À");
+		trocas.add("à");
+		trocas.add("-");
+		trocas.add("”");
+		trocas.add("''");
+		
+		trocas.add("Â");
+		trocas.add("â");
+		trocas.add("Ê");
+		trocas.add("ê");
+		trocas.add("Î");
+		trocas.add("î");
+		trocas.add("Ô");
+		trocas.add("ô");
+		trocas.add("Û");
+		trocas.add("û");
+		
+		
+		return trocas;
+	}
+	
+	private String replaced(String texto, List<String> trocas) {
+		StringBuilder sb = new StringBuilder();
+		String textoAtual = texto;
+		for(String troca : trocas) {
+			sb.append("REPLACE(");
+		}
+		
+		for(int i=0;i<trocas.size();i++) {
+			if(i==0) {
+				sb.append(textoAtual);
+			}
+			sb.append(",'");
+			sb.append(trocas.get(i));
+			sb.append("','");
+			sb.append("')");
+		}
+		
+		return sb.toString();
+	}
+	
+	public static void main(String args[]) {
+		String texto = "cont.nomeresponsavel";
+		List<String> trocas = new ArrayList<>();
+		trocas.add(".");
+		trocas.add("Ã");
+		trocas.add("Ç");
+		trocas.add("É");
+		
+		FinanceiroEscolaService fes = new FinanceiroEscolaService();
+		
+		
+		System.out.println(fes.replaced(texto, trocas));
 	}
 
 	public List<Boleto> findBoletos(boolean cancelado, boolean arquivoGerado) {

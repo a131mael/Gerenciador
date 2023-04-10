@@ -136,6 +136,10 @@ public class CNAB240 {
 		financeiroEscolarService.updateContratoBoleto();
 	}
 	
+	public void updateAnoLetivoEscola() {
+		financeiroEscolaService.updateAnoLetivo();
+	}
+	
 
 	public void importarPagamentosCNAB240() {
 		try {

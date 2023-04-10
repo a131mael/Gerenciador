@@ -7,25 +7,12 @@ d * To change this template, choose Tools | Templates
  */
 package br.com.aff.Administrativo.CNAB_240;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import br.com.service.administrativo.escola.FinanceiroEscolaService;
 import br.com.service.administrativo.escola.FinanceiroEscolarService;
@@ -45,16 +32,69 @@ public class RotinaAutomatica {
 	@Inject
 	private FinanceiroEscolaService financeiroEscolaService;
 
+	// Principal e secundarios
 	@Schedule(minute = "*/7", hour = "*", persistent = false)
 	public synchronized void importarPagamento() {
 		System.out.println("Importando pagamentos do banco......");
 		cnab240.importarPagamentosCNAB240();
 	}
-	
-	@Schedule(minute = "*/1", hour = "*", persistent = false)
+
+	// Principal e secundarios
+	@Schedule(minute = "*/10", hour = "*", persistent = false)
 	public synchronized void updateContratoBoleto() {
 		System.out.println("Update Contrato Boleto");
 		cnab240.updateContratoBoleto();
+	}
+	
+	// Principal e secundarios
+		@Schedule( dayOfMonth = "*/5", persistent = false)
+		public synchronized void updateAnoLetivoEscola() {
+			System.out.println("Update Ano Letivo");
+			cnab240.updateAnoLetivoEscola();
+		}
+
+	// Somente Principal
+	@Schedule(minute = "*", hour = "*/5", persistent = false)
+	public synchronized void geradorDeCnabDeEnvioAdonai() {
+		if (CONSTANTES.isPrincipal()) {
+			System.out.println("Gerando Arquivo CNAB de envio ADONAI......");
+			int mes = 0;
+			Date d = new Date();
+			mes = Util.getMesInt(d);
+			System.out.println("MES: " + mes);
+
+			// Geracao do CNAB para o Mes atual
+			cnab240.gerarCNAB240DeEnvio(mes, Projeto.ADONAI, true);
+			if (mes == 12) {
+				mes = 1;
+			} else {
+				mes++;
+			}
+			// Geracao do CNAB para o mes seguinte
+			cnab240.gerarCNAB240DeEnvio(mes, Projeto.ADONAI, true);
+		}
+
+	}
+
+	// SOMENTE PRINCIPAL
+	@Schedule(minute = "*", hour = "*/7", persistent = false)
+	public synchronized void geradorDeCnabDeEnvioTefamel() {
+		if (CONSTANTES.isPrincipal()) {
+			System.out.println("Gerando Arquivo CNAB de envio TEFAMEL......");
+
+			int mes = 0;
+			Date d = new Date();
+			mes = Util.getMesInt(d);
+
+			// Geracao do CNAB para o Mes atual e o mes seguinte
+			cnab240.gerarCNAB240DeEnvio(mes, Projeto.TEFAMEL, true);
+			if (mes == 12) {
+				mes = 1;
+			} else {
+				mes++;
+			}
+			cnab240.gerarCNAB240DeEnvio(mes, Projeto.TEFAMEL, true);
+		}
 	}
 
 	// TODO REMOVIDO
@@ -64,29 +104,40 @@ public class RotinaAutomatica {
 	// cnab240.importarPagamentosCNAB240(Projeto.TEFAMEL);
 	// }
 
-	// TODO REMOVIDO FIM
+	// SOMENTE principal
 	@Schedule(minute = "*/10", hour = "*", persistent = false)
 	public synchronized void gerarCnabCancelamentoTefamel() {
-		System.out.println("Gerar Cnab Cancelamento ...... TEFAMEL");
-		cnab240.gerarArquivoBaixaBoletos(true, Projeto.TEFAMEL, true);
+		if (CONSTANTES.isPrincipal()) {
+			System.out.println("Gerar Cnab Cancelamento ...... TEFAMEL");
+			cnab240.gerarArquivoBaixaBoletos(true, Projeto.TEFAMEL, true);
+		}
 	}
 
+	// Somente Principal
 	@Schedule(minute = "*/11", hour = "*/3", persistent = false)
 	public synchronized void gerarCnabBaixaTefamel() {
-		System.out.println("Gerar Cnab Cancelamento ...... TEFAMEL");
-		cnab240.gerarArquivoBaixaBoletos(false, Projeto.TEFAMEL, true);
+		if (CONSTANTES.isPrincipal()) {
+			System.out.println("Gerar Cnab Cancelamento ...... TEFAMEL");
+			cnab240.gerarArquivoBaixaBoletos(false, Projeto.TEFAMEL, true);
+		}
 	}
 
+	// Somente Principal
 	@Schedule(minute = "30", hour = "*/2", persistent = false)
 	public synchronized void gerarCnabCancelamentoAdonai() {
-		System.out.println("Gerar Cnab Cancelamento ...... Adonai");
-		cnab240.gerarArquivoBaixaBoletos(true, Projeto.ADONAI, true);
+		if (CONSTANTES.isPrincipal()) {
+			System.out.println("Gerar Cnab Cancelamento ...... Adonai");
+			cnab240.gerarArquivoBaixaBoletos(true, Projeto.ADONAI, true);
+		}
 	}
 
+	// Somente Principal
 	@Schedule(minute = "8", hour = "*/2", persistent = false)
 	public synchronized void gerarCnabBaixaAdonai() {
-		System.out.println("Gerar Cnab Cancelamento ...... Adonai");
-		cnab240.gerarArquivoBaixaBoletos(false, Projeto.ADONAI, true);
+		if (CONSTANTES.isPrincipal()) {
+			System.out.println("Gerar Cnab Cancelamento ...... Adonai");
+			cnab240.gerarArquivoBaixaBoletos(false, Projeto.ADONAI, true);
+		}
 	}
 
 	// @Schedule(minute = "17", hour = "03", persistent = false)
@@ -125,43 +176,6 @@ public class RotinaAutomatica {
 	//
 	// }
 	// }
-
-	@Schedule(minute = "*", hour = "*/4", persistent = false)
-	public synchronized void geradorDeCnabDeEnvioAdonai() {
-		System.out.println("Gerando Arquivo CNAB de envio ADONAI......");
-		int mes = 0;
-		Date d = new Date();
-		mes = Util.getMesInt(d);
-		System.out.println("MES: " + mes);
-
-		// Geracao do CNAB para o Mes atual
-		cnab240.gerarCNAB240DeEnvio(mes, Projeto.ADONAI, true);
-		if (mes == 12) {
-			mes = 1;
-		} else {
-			mes++;
-		}
-		// Geracao do CNAB para o mes seguinte
-		cnab240.gerarCNAB240DeEnvio(mes, Projeto.ADONAI, true);
-	}
-
-	@Schedule(minute = "*", hour = "*/7", persistent = false)
-	public synchronized void geradorDeCnabDeEnvioTefamel() {
-		System.out.println("Gerando Arquivo CNAB de envio TEFAMEL......");
-
-		int mes = 0;
-		Date d = new Date();
-		mes = Util.getMesInt(d);
-
-		// Geracao do CNAB para o Mes atual e o mes seguinte
-		cnab240.gerarCNAB240DeEnvio(mes, Projeto.TEFAMEL, true);
-		if (mes == 12) {
-			mes = 1;
-		} else {
-			mes++;
-		}
-		cnab240.gerarCNAB240DeEnvio(mes, Projeto.TEFAMEL, true);
-	}
 
 //	@Schedule(minute = "*", hour = "*/3", persistent = false)
 //	public synchronized void enviarNFSTefamel(String pasta, String login, String senha) {

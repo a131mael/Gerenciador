@@ -3,7 +3,12 @@ package br.com.aff.Administrativo.CNAB_240;
 import java.io.File;
 
 public class CONSTANTES {
-	public static String usuario = "server";
+	
+	public static String usuario = "server"; //server é o usuario principal, caso mudar o servidor principal influencia quando tem secundarios
+	
+//	public static String usuario = "pikachu"; //servidor pikachu
+	
+	public static String usuarioPrincipal = "server"; //TODO indica quem é o servidor master mudar somente se mudar o servidor principal
 	public static int projetoTefamel = 1;
 	public static int projetoAdonai = 2;
 	public static String nomeProjeto = "adonai";
@@ -12,9 +17,9 @@ public class CONSTANTES {
 	
 	
 	// USO NO SERVIDOR
+	public static String LOCAL_ARMAZENAMENTO_REMESSA_IMPORTADA = File.separator+"home" + File.separator + usuario + File.separator+"Skyunix" + File.separator+"importado"+ File.separator;
 	public static String PATH_ENVIAR_CNAB = File.separator+"home"+File.separator + usuario + File.separator+"Skyunix" + File.separator +"outbox" + File.separator;
 	public static String LOCAL_ARMAZENAMENTO_REMESSA = File.separator+"home"+File.separator + usuario + File.separator+"Skyunix" + File.separator+"inbox"+ File.separator;
-	public static String LOCAL_ARMAZENAMENTO_REMESSA_IMPORTADA = File.separator+"home" + File.separator + usuario + File.separator+"Skyunix" + File.separator+"importado"+ File.separator;
 	public static String PATH_ENVIAR_BAIXA = File.separator+"home"+File.separator+ usuario + File.separator+"cnab" + File.separator +nomeProjeto + File.separator + "enviar" + File.separator +"baixa" +  File.separator;
 	public static String PATH_ENVIAR_BAIXA_CANCELADOS = File.separator+"home"+File.separator+usuario + File.separator+"cnab" + File.separator +nomeProjeto + File.separator + "enviar" + File.separator +"baixaCancelados" +  File.separator;
 	
@@ -27,5 +32,10 @@ public class CONSTANTES {
 //	public static String PATH_ENVIAR_BAIXA = "C:\\Sicoobnet\\RetornoCNAB\\"+nomeProjeto + File.separator + "enviar" + File.separator +"baixa" + File.separator;
 //	public static String PATH_ENVIAR_CNAB = "C:\\Sicoobnet\\RetornoCNABIMPORTADO\\";
 	/*public static String PATH_ENVIAR_CNAB = "C:\\Sicoobnet\\RetornoCNAB\\"+nomeProjeto + File.separator + "enviar" + File.separator;*/
+
+	
+	public static boolean isPrincipal() {
+		return CONSTANTES.usuario.equalsIgnoreCase(CONSTANTES.usuarioPrincipal);
+	}
 	
 }

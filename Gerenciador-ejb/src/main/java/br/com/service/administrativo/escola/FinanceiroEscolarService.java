@@ -138,7 +138,13 @@ public class FinanceiroEscolarService extends Service {
 		sql.append(numeroBoleto);
 		
 		sql.append(" and bol.contrato_id = cont.id ");
-		sql.append( " and UPPER(trim( REPLACE(REPLACE(REPLACE(cont.nomeresponsavel,'.',''),'Ã' ,'' ),'Ç',''))) like "  );
+		
+		sql.append( " and UPPER(trim( "  );
+		sql.append(replaced("cont.nomeresponsavel", trocasLetrasEspeciais()));
+		sql.append( "  )) like  "  );
+		//sql.append( " and UPPER(trim( REPLACE(REPLACE(REPLACE(cont.nomeresponsavel,'.',''),'Ã' ,'' ),'Ç',''))) like "  );
+	
+		
 		sql.append( "UPPER('%" );
 		sql.append( nomePagador.trim() );
 		sql.append( "%')" );
@@ -173,6 +179,70 @@ public class FinanceiroEscolarService extends Service {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 		}
+	}
+	
+	
+	private List<String> trocasLetrasEspeciais(){
+		List<String> trocas = new ArrayList<>();
+		trocas.add(".");
+		trocas.add("Ã");
+		trocas.add("ã");
+		trocas.add("Ç");
+		trocas.add("ç");
+		trocas.add("É");
+		trocas.add("é");
+		
+		trocas.add(".");
+		trocas.add("º");
+		trocas.add("ª");
+		trocas.add("Á");
+		trocas.add("á");
+		trocas.add("Í");
+		trocas.add("í");
+		
+		trocas.add("Ó");
+		trocas.add("ó");
+		trocas.add("Ú");
+		trocas.add("ú");
+		trocas.add("À");
+		trocas.add("à");
+		trocas.add("-");
+		trocas.add("”");
+		trocas.add("''");
+		
+		trocas.add("Â");
+		trocas.add("â");
+		trocas.add("Ê");
+		trocas.add("ê");
+		trocas.add("Î");
+		trocas.add("î");
+		trocas.add("Ô");
+		trocas.add("ô");
+		trocas.add("Û");
+		trocas.add("û");
+		
+		
+		return trocas;
+	}
+	
+	private String replaced(String texto, List<String> trocas) {
+		StringBuilder sb = new StringBuilder();
+		String textoAtual = texto;
+		for(String troca : trocas) {
+			sb.append("REPLACE(");
+		}
+		
+		for(int i=0;i<trocas.size();i++) {
+			if(i==0) {
+				sb.append(textoAtual);
+			}
+			sb.append(",'");
+			sb.append(trocas.get(i));
+			sb.append("','");
+			sb.append("')");
+		}
+		
+		return sb.toString();
 	}
 	
 	public List<Boleto> findBoletos(boolean cancelado, boolean arquivoGerado) {
