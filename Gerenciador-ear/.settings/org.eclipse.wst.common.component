@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-            
+                            
+    
+    
+    
+    
     
     <wb-module deploy-name="Gerenciador-ear">
-                        
+                                                        
+        
+        
+        
+        
         
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/ear-resources"/>
-                        
+                                                        
+        
+        
+        
+        
         
         <wb-resource deploy-path="/" source-path="/src/main/application" tag="defaultRootSource"/>
         <dependent-module archiveName="Gerenciador-ejb.jar" deploy-path="/" handle="module:/resource/Gerenciador-ejb/Gerenciador-ejb">
@@ -17,19 +29,19 @@
         <dependent-module archiveName="javax.transaction-api.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/javax/transaction/javax.transaction-api/1.2/javax.transaction-api-1.2.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="Financeiro.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/aaf/financeiro/Financeiro/0.0.1-SNAPSHOT/Financeiro-0.0.1-SNAPSHOT.jar">
+        <dependent-module archiveName="Financeiro.jar" deploy-path="/lib" handle="module:/resource/Financeiro/Financeiro">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="joda-time.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/joda-time/joda-time/2.9.9/joda-time-2.9.9.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="caelum-stella-boleto.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/br/com/caelum/stella/caelum-stella-boleto/2.1.2/caelum-stella-boleto-2.1.2.jar">
+        <dependent-module archiveName="caelum-stella-boleto.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/br/com/caelum/stella/caelum-stella-boleto/2.1.6/caelum-stella-boleto-2.1.6.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="barbecue.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/net/sourceforge/barbecue/barbecue/1.5-beta1/barbecue-1.5-beta1.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="caelum-stella-core.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/br/com/caelum/stella/caelum-stella-core/2.1.2/caelum-stella-core-2.1.2.jar">
+        <dependent-module archiveName="caelum-stella-core.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/br/com/caelum/stella/caelum-stella-core/2.1.6/caelum-stella-core-2.1.6.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="jasperreports.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/net/sf/jasperreports/jasperreports/5.5.0/jasperreports-5.5.0.jar">
@@ -71,9 +83,6 @@
         <dependent-module archiveName="jackson-databind.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/fasterxml/jackson/core/jackson-databind/2.1.4/jackson-databind-2.1.4.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="jackson-annotations.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/fasterxml/jackson/core/jackson-annotations/2.1.4/jackson-annotations-2.1.4.jar">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <dependent-module archiveName="mail.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/javax/mail/mail/1.4/mail-1.4.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
@@ -101,7 +110,7 @@
         <dependent-module archiveName="jboss-logging-annotations.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/jboss/logging/jboss-logging-annotations/1.2.0.Beta1/jboss-logging-annotations-1.2.0.Beta1.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="EscolaDTO.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/escola/EscolaDTO/EscolaDTO/0.0.1-SNAPSHOT/EscolaDTO-0.0.1-SNAPSHOT.jar">
+        <dependent-module archiveName="EscolaDTO.jar" deploy-path="/lib" handle="module:/resource/EscolaDTO/EscolaDTO">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="json.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/json/json/20160212/json-20160212.jar">
@@ -120,6 +129,9 @@
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="httpcore.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/httpcomponents/httpcore/4.3.2/httpcore-4.3.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jackson-annotations.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/fasterxml/jackson/core/jackson-annotations/2.14.2/jackson-annotations-2.14.2.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="poi.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/poi/poi/3.15/poi-3.15.jar">
@@ -272,9 +284,17 @@
         <dependent-module archiveName="apache-mime4j-core.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/james/apache-mime4j-core/0.7.2/apache-mime4j-core-0.7.2.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-                    
+                                                    
+    
+    
+    
+    
     
     </wb-module>
-        
+                        
+
+
+
+
 
 </project-modules>

@@ -327,8 +327,20 @@ public class CNAB240 {
 		gerarCNABDoMES(mes, projeto, arquivoUnico);
 
 	}
+	public void gerarCNAB240DeEnvio(int mes, Projeto projeto, boolean arquivoUnico, int ano) {
+		// PROJETO
+		// 1 = Tefamel
+		// 2 = Adonai
+		gerarCNABDoMES(mes, projeto, arquivoUnico,ano);
+
+	}
 
 	public void gerarCNABDoMES(int mes, Projeto projeto, boolean arquivoUnico) {
+		Calendar calendario = Calendar.getInstance();
+		gerarCNABDoMES(mes, projeto, arquivoUnico, calendario.get(Calendar.YEAR));
+	}
+
+	public void gerarCNABDoMES(int mes, Projeto projeto, boolean arquivoUnico, int ano) {
 		try {
 			Calendar calendario = Calendar.getInstance();
 
@@ -339,10 +351,10 @@ public class CNAB240 {
 
 			List<Boleto> boletos = null;
 			if (projeto.equals(Projeto.TEFAMEL)) {
-				boletos = configuracaoEscolarService.findBoletosMes(mes);
+				boletos = configuracaoEscolarService.findBoletosMes(mes,ano);
 
 			} else if (projeto.equals(Projeto.ADONAI)) {
-				boletos = configuracaoEscolaService.findBoletosMes(mes);
+				boletos = configuracaoEscolaService.findBoletosMes(mes,ano);
 			}
 
 			System.out.println("Boletos pra enviar" + boletos.size());
@@ -350,9 +362,13 @@ public class CNAB240 {
 			String caminhoFinalPasta = CONSTANTES.PATH_ENVIAR_CNAB;
 
 			if (boletos != null && boletos.size() > 0) {
+				System.out.println("Controle 1" );
 				if (arquivoUnico) {
+					System.out.println("Controle 1 A" );
 					InputStream stream = gerarCNB240(boletos, mes, caminhoFinalPasta, projeto);
-					FileUtils.inputStreamToFile(stream, calendario.getTime().getTime() + ".txt");
+					System.out.println("Pre input strean" );
+					FileUtils.inputStreamToFile(stream, caminhoFinalPasta +calendario.getTime().getTime() + ".txt");
+					System.out.println("Controle Gerou input stream" );
 					if (projeto.equals(Projeto.TEFAMEL)) {
 						configuracaoEscolarService.mudarStatusParaCNABEnviado(boletos);
 
@@ -360,9 +376,10 @@ public class CNAB240 {
 						configuracaoEscolaService.mudarStatusParaCNABEnviado(boletos);
 					}
 				} else {
+					System.out.println("Controle 1 B" );
 					for (Boleto b : boletos) {
 						InputStream stream = gerarCNB240(b, mes, caminhoFinalPasta, projeto);
-						FileUtils.inputStreamToFile(stream, b.getNossoNumero() + "");
+						FileUtils.inputStreamToFile(stream, caminhoFinalPasta + b.getNossoNumero() + "");
 						if (projeto.equals(Projeto.TEFAMEL)) {
 							configuracaoEscolarService.mudarStatusParaCNABEnviado(b);
 
@@ -380,6 +397,7 @@ public class CNAB240 {
 
 	}
 
+	
 	public void gerarCNABDoMES(int mes, Projeto projeto) {
 		gerarCNABDoMES(mes, projeto, false);
 
@@ -420,6 +438,8 @@ public class CNAB240 {
 			} else if (projeto.equals(Projeto.TEFAMEL)) {
 				sequencialArquivo = configuracaoEscolarService.getSequencialArquivo() + "";
 			}
+			
+			System.out.println("inicio do controle geracao para sequencial " +  sequencialArquivo);
 
 			InputStream stream = gerarCNB240(sequencialArquivo, boletos, mes, caminhoArquivo, projeto);
 
@@ -481,7 +501,8 @@ public class CNAB240 {
 	public static InputStream gerarCNB240(String sequencialArquivo, List<Boleto> boletos, int mes,
 			String caminhoArquivo, Projeto projeto) {
 		try {
-
+			System.out.println("Dados para input caminhoArquivo, projeto, mes,qtdadeBoleto" +  caminhoArquivo+ " , " + projeto+ ", " + mes + " , " + boletos.size() );
+					
 			List<org.aaf.financeiro.model.Pagador> pagadores = new ArrayList<>();
 			for (Boleto b : boletos) {
 				org.aaf.financeiro.model.Pagador pg = getPagadorFinanceiro(b);
@@ -494,6 +515,8 @@ public class CNAB240 {
 			} else if (projeto.equals(Projeto.ADONAI)) {
 				remessaCNAB240 = new CNAB240_REMESSA_SICOOB(2);
 			}
+			
+			System.out.println("pre byte[]");
 			byte[] arquivo = remessaCNAB240.geraRemessa(pagadores, sequencialArquivo, false, caminhoArquivo);
 
 			try {

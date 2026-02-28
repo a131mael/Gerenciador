@@ -6,7 +6,7 @@ public class CONSTANTES {
 	
 	public static String usuario = "server"; //server é o usuario principal, caso mudar o servidor principal influencia quando tem secundarios
 	
-//	public static String usuario = "pikachu"; //servidor pikachu
+	//public static String usuario = "servidor2"; //servidor server
 	
 	public static String usuarioPrincipal = "server"; //TODO indica quem é o servidor master mudar somente se mudar o servidor principal
 	public static int projetoTefamel = 1;

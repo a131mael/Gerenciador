@@ -110,7 +110,7 @@ public class ConfiguracaoEscolaService extends Service {
 		save(conf);
 	}
 
-	public List<Boleto> findBoletosMes(int mes) {
+	public List<Boleto> findBoletosMes(int mes, int ano) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * from boleto bol ");
 		sql.append(" where 1 = 1");
@@ -119,9 +119,9 @@ public class ConfiguracaoEscolaService extends Service {
 		sql.append(" and (bol.cnabEnviado = false or bol.cnabEnviado is null)");
 		sql.append(" and (bol.valorPago = 0 or bol.valorPago is null)");
 		sql.append(" and bol.vencimento > '" + br.com.service.administrativo.util.Util.getDataInicioMesString(mes,
-				getConfiguracao().getAnoLetivo()) + "'");
+				ano) + "'");
 		sql.append(" and bol.vencimento < '" + br.com.service.administrativo.util.Util.getDataFimMesString(mes,
-				getConfiguracao().getAnoLetivo()) + "'");
+				ano) + "'");
 
 		Query query = em.createNativeQuery(sql.toString());
 		@SuppressWarnings("unchecked")
@@ -170,6 +170,15 @@ public class ConfiguracaoEscolaService extends Service {
 			boletosAx.add(b);
 		}
 		return boletosAx;
+	}
+
+	
+	
+	
+	
+	public List<Boleto> findBoletosMes(int mes) {
+			
+		return 	findBoletosMes(mes, getConfiguracao().getAnoLetivo());
 	}
 
 	public List<Boleto> findBoletosCancelados(boolean jaEnviado) {

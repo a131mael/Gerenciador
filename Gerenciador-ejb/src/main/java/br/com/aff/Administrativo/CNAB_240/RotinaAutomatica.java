@@ -7,8 +7,10 @@ d * To change this template, choose Tools | Templates
  */
 package br.com.aff.Administrativo.CNAB_240;
 
+import java.util.Calendar;
 import java.util.Date;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -31,6 +33,11 @@ public class RotinaAutomatica {
 
 	@Inject
 	private FinanceiroEscolaService financeiroEscolaService;
+	
+	@PostConstruct
+	public void init() {
+	    System.out.println("ROTINA AUTOMATICA SUBIU");
+	}
 
 	// Principal e secundarios
 	@Schedule(minute = "*/7", hour = "*", persistent = false)
@@ -47,14 +54,14 @@ public class RotinaAutomatica {
 	}
 	
 	// Principal e secundarios
-		@Schedule( dayOfMonth = "*/5", persistent = false)
+		@Schedule( hour = "*/12", persistent = false)
 		public synchronized void updateAnoLetivoEscola() {
 			System.out.println("Update Ano Letivo");
 			cnab240.updateAnoLetivoEscola();
 		}
 
 	// Somente Principal
-	@Schedule(minute = "*", hour = "*/5", persistent = false)
+	@Schedule(minute = "*/7", hour = "*", persistent = false)
 	public synchronized void geradorDeCnabDeEnvioAdonai() {
 		if (CONSTANTES.isPrincipal()) {
 			System.out.println("Gerando Arquivo CNAB de envio ADONAI......");
@@ -67,33 +74,43 @@ public class RotinaAutomatica {
 			cnab240.gerarCNAB240DeEnvio(mes, Projeto.ADONAI, true);
 			if (mes == 12) {
 				mes = 1;
+				Calendar calendario = Calendar.getInstance();
+				int ano = calendario.get(Calendar.YEAR);
+				ano++;
+				cnab240.gerarCNAB240DeEnvio(mes, Projeto.ADONAI, true,ano);
 			} else {
+				// Geracao do CNAB para o mes seguinte
 				mes++;
+				cnab240.gerarCNAB240DeEnvio(mes, Projeto.ADONAI, true);
 			}
-			// Geracao do CNAB para o mes seguinte
-			cnab240.gerarCNAB240DeEnvio(mes, Projeto.ADONAI, true);
 		}
 
 	}
 
 	// SOMENTE PRINCIPAL
-	@Schedule(minute = "*", hour = "*/7", persistent = false)
+	@Schedule(minute = "*/5", hour = "*", persistent = false)
 	public synchronized void geradorDeCnabDeEnvioTefamel() {
+		System.out.println("Gerando Arquivo CNAB de envio TEFAMEL......");
 		if (CONSTANTES.isPrincipal()) {
-			System.out.println("Gerando Arquivo CNAB de envio TEFAMEL......");
-
+			System.out.println("É principal");
 			int mes = 0;
 			Date d = new Date();
 			mes = Util.getMesInt(d);
 
-			// Geracao do CNAB para o Mes atual e o mes seguinte
+
+			// Geracao do CNAB para o Mes atual
 			cnab240.gerarCNAB240DeEnvio(mes, Projeto.TEFAMEL, true);
 			if (mes == 12) {
 				mes = 1;
+				Calendar calendario = Calendar.getInstance();
+				int ano = calendario.get(Calendar.YEAR);
+				ano++;
+				cnab240.gerarCNAB240DeEnvio(mes, Projeto.TEFAMEL, true,ano);
 			} else {
+				// Geracao do CNAB para o mes seguinte
 				mes++;
+				cnab240.gerarCNAB240DeEnvio(mes, Projeto.TEFAMEL, true);
 			}
-			cnab240.gerarCNAB240DeEnvio(mes, Projeto.TEFAMEL, true);
 		}
 	}
 

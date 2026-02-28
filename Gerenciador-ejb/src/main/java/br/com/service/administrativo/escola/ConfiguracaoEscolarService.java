@@ -111,6 +111,11 @@ public class ConfiguracaoEscolarService extends Service {
 	}
 
 	public List<Boleto> findBoletosMes(int mes) {
+		
+		return findBoletosMes(mes, getConfiguracao().getAnoLetivo());
+	}
+	
+	public List<Boleto> findBoletosMes(int mes, int ano) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * from boleto bol ");
 		sql.append(" where 1 = 1");
@@ -119,54 +124,77 @@ public class ConfiguracaoEscolarService extends Service {
 		sql.append(" and (bol.cnabEnviado = false or bol.cnabEnviado is null)");
 		sql.append(" and (bol.valorPago = 0 or bol.valorPago is null)");
 		sql.append(" and bol.vencimento > '" + br.com.service.administrativo.util.Util.getDataInicioMesString(mes,
-				getConfiguracao().getAnoLetivo()) + "'");
+				ano) + "'");
 		sql.append(" and bol.vencimento < '" + br.com.service.administrativo.util.Util.getDataFimMesString(mes,
-				getConfiguracao().getAnoLetivo()) + "'");
+				ano) + "'");
 
-		Query query = em.createNativeQuery(sql.toString());
-		List<Object[]> boletos = query.getResultList();
-		System.out.println("QUERY  BOLEtoS = " + sql);
-		System.out.println("Total de boletos = " + boletos.size());
 		List<Boleto> boletosAx = new ArrayList<>();
-		for (Object[] bo : boletos) {
-			System.out.println(bo[0]);
-
-			BigInteger id = (BigInteger) bo[0];
-			Date vencimento =  (Date) bo[7];
-			Date emissao = (Date) bo[5];
-			double valorNominal = (double) bo[6];
-			BigInteger nossoNumero = (BigInteger) bo[9];
-			Double valorPago =  (Double) bo[11];
-			Date dataPagamento = (Date) bo[10];;
-
-			BigInteger idContrato = (BigInteger) bo[18];
-			Object[] contratoAluno = getContrato(id.longValue());
-			//Dados do pagador
-			String cep =  (String) contratoAluno[5];
-			String cidade =  (String) contratoAluno[6];
-			String cpfResponsavel = (String) contratoAluno[9];
-			String nomeResponsavel = (String) contratoAluno[18];
-			String endereco = (String) contratoAluno[13];
-			String UF = "SC";
-			String bairro = (String) contratoAluno[3];
+		try {
+			Query query = em.createNativeQuery(sql.toString());
+			List<Object[]> boletos = query.getResultList();
+			System.out.println("QUERY  BOLEtoS = " + sql);
+			System.out.println("Total de boletos = " + boletos.size());
 			
-			Boleto b = new Boleto();
-			b.setId(id.longValue());
-			b.setBairro(bairro);
-			b.setCep(cep);
-			b.setCidade(cidade);
-			b.setCpfResponsavel(cpfResponsavel);
-			b.setDataPagamento(dataPagamento);
-			b.setEmissao(emissao);
-			b.setEndereco(endereco);
-			b.setNomeResponsavel(nomeResponsavel);
-			b.setNossoNumero(nossoNumero.toString());
-			b.setUF(UF);
-			b.setValorNominal(valorNominal);
-			b.setValorPago(valorPago);
-			b.setVencimento(vencimento);
-			boletosAx.add(b);
+			for (Object[] bo : boletos) {
+				System.out.println(bo[0]);
+
+				BigInteger id = (BigInteger) bo[0];
+				Date vencimento =  (Date) bo[7];
+				Date emissao = (Date) bo[5];
+				double valorNominal = (double) bo[6];
+				BigInteger nossoNumero = (BigInteger) bo[9];
+				Double valorPago =  (Double) bo[11];
+				Date dataPagamento = (Date) bo[10];;
+
+				BigInteger idContrato = (BigInteger) bo[18];
+				Object[] contratoAluno = null;
+				try {
+					contratoAluno = getContrato(id.longValue()); 
+				}catch (Exception e) {
+					
+				}
+			
+				if(contratoAluno == null || contratoAluno[9] == null || contratoAluno[9].equals("")) {
+					try {
+						contratoAluno = getContratoById(idContrato);
+					}catch (Exception e) {
+					}
+				}
+				if(contratoAluno == null || contratoAluno[9] == null || contratoAluno[9].equals("")) {
+					continue;	
+				}
+				
+				//Dados do pagador
+				String cep =  (String) contratoAluno[5];
+				String cidade =  (String) contratoAluno[6];
+				String cpfResponsavel = (String) contratoAluno[9];
+				String nomeResponsavel = (String) contratoAluno[18];
+				String endereco = (String) contratoAluno[13];
+				String UF = "SC";
+				String bairro = (String) contratoAluno[3];
+				
+				Boleto b = new Boleto();
+				b.setId(id.longValue());
+				b.setBairro(bairro);
+				b.setCep(cep);
+				b.setCidade(cidade);
+				b.setCpfResponsavel(cpfResponsavel);
+				b.setDataPagamento(dataPagamento);
+				b.setEmissao(emissao);
+				b.setEndereco(endereco);
+				b.setNomeResponsavel(nomeResponsavel);
+				b.setNossoNumero(nossoNumero.toString());
+				b.setUF(UF);
+				b.setValorNominal(valorNominal);
+				b.setValorPago(valorPago);
+				b.setVencimento(vencimento);
+				boletosAx.add(b);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
+		
+		
 		return boletosAx;
 	}
 	
@@ -196,21 +224,32 @@ public class ConfiguracaoEscolarService extends Service {
 		sql.append(" where 1 = 1");
 		sql.append(" and (bol.baixaManual = true)");
 		
-		sql.append(" and (cnabCanceladoEnviado is null)");
-		sql.append(" and (vencimento > '2021-09-01')");
+		sql.append(" and (cnabCanceladoEnviado is null or cnabCanceladoEnviado = false)");
+		sql.append(" and (vencimento > '2023-09-01')");
 		
 		sql.append(" and (bol.baixaGerada = false or bol.baixaGerada is null)");
 		sql.append(" and (bol.cnabEnviado = true)");
 		
 		Query query = em.createNativeQuery(sql.toString());
-		List<Object[]> boletos = query.getResultList();
-		List<Boleto> boletosAx = new ArrayList<>();
-		for (Object[] bo : boletos) {
+		List<Object[]> boletos = null;
+		try {
+			boletos = query.getResultList();
 			
-			Boleto b = montaBoleto(bo);
-			boletosAx.add(b);
+		}catch (Exception e) {
+		}
+		
+		
+		List<Boleto> boletosAx = new ArrayList<>();
+		if(boletos != null) {
+			for (Object[] bo : boletos) {
+				
+				Boleto b = montaBoleto(bo);
+				boletosAx.add(b);
+			}
+			return boletosAx;	
 		}
 		return boletosAx;
+		
 	}
 
 	private Boleto montaBoleto(Object[] bo) {
@@ -253,6 +292,7 @@ public class ConfiguracaoEscolarService extends Service {
 		return b;
 	}
 
+	//TODO AQUI QUE TA A CAGADA.... nao ta gerando esse tal de  contratoAluno_boleto
 	private Long getContrato_boleto(Long idBoleto) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * from contratoAluno_boleto cab ");
@@ -279,6 +319,23 @@ public class ConfiguracaoEscolarService extends Service {
 		
 		return contratoAluno;
 	}
+
+	
+	private Object[] getContratoById(BigInteger idBoleto) {
+		Long idContrato = idBoleto.longValue();
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * from contratoAluno ca ");
+		sql.append(" where 1 = 1");
+		sql.append(" and ca.id = ");
+		sql.append(idContrato);
+
+		Query query = em.createNativeQuery(sql.toString());
+		Object[] contratoAluno = (Object[]) query.getSingleResult();
+		
+		return contratoAluno;
+	}
+	
+	
 
 	public void mudarStatusParaCNABEnviado(Boleto b) {
 		em.flush();
