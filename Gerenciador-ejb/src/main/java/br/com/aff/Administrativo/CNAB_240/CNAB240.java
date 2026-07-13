@@ -101,8 +101,11 @@ public class CNAB240 {
 											
 											financeiroEscolaService.updateBoleto(numeroDocumentoLong, pagador.getNome(),boletoCNAB.getValorPago(), boletoCNAB.getDataPagamento(),	extratoBancario);
 										} else if ((boletoCNAB.isDecurso() != null && boletoCNAB.isDecurso())) {
-											financeiroEscolaService.updateBoletoProtesto(numeroDocumentoLong,pagador.getNome(), extratoBancario);
-											System.out.println("DECURSO PQP");
+											// Baixa por decurso de prazo reportada pelo banco NAO deve mais protestar
+											// o contrato automaticamente: baixa manual sem sincronizar com o banco
+											// também gera esse retorno depois de 6 meses, e o contrato pode já estar
+											// pago - a decisao de protestar precisa ser manual (tela de devedores).
+											System.out.println("DECURSO - ignorado, sem marcar protesto automatico");
 										}
 									}
 
@@ -110,8 +113,8 @@ public class CNAB240 {
 										if (!(boletoCNAB.isDecurso() != null && boletoCNAB.isDecurso())) {
 											financeiroEscolarService.updateBoleto(numeroDocumentoLong,pagador.getNome(), boletoCNAB.getValorPago(),	boletoCNAB.getDataPagamento(), extratoBancario);
 										} else if ((boletoCNAB.isDecurso() != null && boletoCNAB.isDecurso())) {
-											financeiroEscolarService.updateBoletoProtesto(numeroDocumentoLong,pagador.getNome(), extratoBancario);
-											System.out.println("DECURSO PQP");
+											// Mesma correcao: nao protestar automaticamente por decurso de prazo
+											System.out.println("DECURSO - ignorado, sem marcar protesto automatico");
 										}
 									}
 								}
