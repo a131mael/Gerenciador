@@ -264,7 +264,14 @@ public class ConfiguracaoEscolarService extends Service {
 		Date dataPagamento = (Date) bo[10];;
 
 		BigInteger idContrato = (BigInteger) bo[18];
-		Object[] contratoAluno = getContrato(id.longValue());
+		// Antes chamava getContrato(id.longValue()), que resolve o contrato indiretamente via a
+		// tabela contratoAluno_boleto (join table que às vezes não é preenchida, causando
+		// NoResultException e travando o lote inteiro de geração de CNAB) — o contrato_id já
+		// vem direto na própria linha do boleto (bo[18], extraído acima), então usa ele direto
+		// via getContratoById, sem depender dessa tabela intermediária. Achado real 10/ago/2026:
+		// 44 boletos com baixaManual pendente de CNAB tinham contrato_id preenchido mas sem
+		// linha correspondente em contratoAluno_boleto.
+		Object[] contratoAluno = getContratoById(idContrato);
 		//Dados do pagador
 		String cep =  (String) contratoAluno[5];
 		String cidade =  (String) contratoAluno[6];
